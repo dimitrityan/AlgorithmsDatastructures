@@ -55,6 +55,5 @@ indirect enum BinaryTree<T> {
 }*/
 
 let rootNode = Node(value: 5)
-
 // let binaryTree = BinTree<Int>(root: BinaryTree.Node(value: 5, left: BinaryTree.Leaf, right: BinaryTree.Leaf))
 

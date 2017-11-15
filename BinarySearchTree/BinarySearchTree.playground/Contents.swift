@@ -1,10 +1,10 @@
 //: Playground - noun: a place where people can play
 
 class BinarySearchTree<T: Comparable> {
-    private(set) public var value: T
-    private(set) public var parent: BinarySearchTree?
-    private(set) public var left: BinarySearchTree?
-    private(set) public var right: BinarySearchTree?
+    public var value: T
+    public var parent: BinarySearchTree?
+    public var left: BinarySearchTree?
+    public var right: BinarySearchTree?
     
     init(value: T) {
         self.value = value
@@ -26,6 +26,22 @@ class BinarySearchTree<T: Comparable> {
         return self === parent?.left
     }
     
+    func isValidBST() -> Bool {
+        if let left = self.left {
+            if left.value >= value {
+                return false
+            }
+            return left.isValidBST()
+        }
+        if let right = self.right {
+            if right.value <= value {
+                return false
+            }
+            return right.isValidBST()
+        }
+        return true
+    }
+    
     func max() -> BinarySearchTree {
         guard let right = self.right else {
             return self
@@ -41,7 +57,7 @@ class BinarySearchTree<T: Comparable> {
     }
     
     func insert(value: T) {
-        // Value to insert is smaller or equal to current node's value
+        // Value to insert is smaller than current node's value
         if value < self.value {
             guard let left = self.left else {
                 self.left = BinarySearchTree<T>(value: value)
@@ -49,10 +65,11 @@ class BinarySearchTree<T: Comparable> {
                 return
             }
             left.insert(value: value)
-        } else {
+        }
+        if value > self.value {
             guard let right = self.right else {
                 self.right = BinarySearchTree<T>(value: value)
-                self.right?.parent = self
+                self.right!.parent = self
                 return
             }
             right.insert(value: value)
@@ -62,43 +79,95 @@ class BinarySearchTree<T: Comparable> {
     func search(value: T) -> BinarySearchTree<T>? {
         if value < self.value {
             return left?.search(value: value)
-        } else if value > self.value {
-            return right?.search(value: value)
-        } else {
-            return self
         }
+        if value > self.value {
+            return right?.search(value: value)
+        }
+        return self
     }
     
-    func remove(value: T) {
-        // If a node is remove and is not a leaf replace the deleted node with
+    func remove() {
+        // If a node is removed and is not a leaf replace the deleted node with
         // biggest child on the left or the smallest child on the right -> sorted tree maintained
-        guard let toRemove = search(value: value) else {
-            // Element to remove not found
-            print("Element \(value) not found!")
-            return
-        }
         let replacement: BinarySearchTree?
         
-        if let left = toRemove.left {
+        if let left = left {
             replacement = left.max()
-        } else if let right = toRemove.right {
+        } else if let right = right {
             replacement = right.min()
         } else {
             replacement = nil
         }
         
-        replacement?.remove(value: value)
+        replacement?.remove()
+        replacement?.right = right
+        replacement?.left = left
+        right?.parent = replacement
+        left?.parent = replacement
         
-        if toRemove.isLeftChild {
-            toRemove.parent?.left = replacement
-        } else {
-            toRemove.parent?.right = replacement
+        if let parent = parent {
+            if isLeftChild {
+                parent.left = replacement
+            } else {
+                parent.right = replacement
+            }
+            replacement?.parent = parent
         }
+        
+        parent = nil
+        right = nil
+        left = nil
     }
 }
 
-let root = BinarySearchTree<Int>(value: 5)
-root.insert(value: 2)
-root.insert(value: 10)
-root.insert(value: 2)
+extension BinarySearchTree: CustomStringConvertible {
+    var description: String {
+        return ""
+    }
+    
+    // Check if current is null
+    // Process current node
+    // Traverse left subtree (rec)
+    // Traverse right subtree (rec)
+    func preOrder(process: (T) -> Void) {
+        process(value)
+        left?.preOrder(process: process)
+        right?.preOrder(process: process)
+    }
+    
+    // Check if current is null
+    // Traverse left subtree (rec)
+    // Process current node
+    // Traverse right subtree (rec)
+    func inOrder(process: (T) -> Void) {
+        left?.inOrder(process: process)
+        process(value)
+        right?.inOrder(process: process)
+    }
+    
+    // Check if current is null
+    // Traverse left subtree (rec)
+    // Traverse right subtree (rec)
+    // Process current node
+    func postOrder(process: (T) -> Void) {
+        left?.postOrder(process: process)
+        right?.postOrder(process: process)
+        process(value)
+    }
+}
 
+let root = BinarySearchTree<Int>(value: 7)
+root.insert(value: 2)
+root.insert(value: 1)
+root.insert(value: 4)
+root.insert(value: 3)
+root.insert(value: 5)
+root.insert(value: 10)
+root.insert(value: 8)
+root.insert(value: 9)
+root.insert(value: 12)
+root.insert(value: 11)
+root.insert(value: 13)
+root.search(value: 10)?.remove()
+root.inOrder{ value in print(value) }
+root.isValidBST()

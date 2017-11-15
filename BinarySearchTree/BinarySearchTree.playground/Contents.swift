@@ -77,28 +77,28 @@ class BinarySearchTree<T: Comparable> {
             print("Element \(value) not found!")
             return
         }
-        // TODO
-        guard let left = toRemove.left else {
-            guard let right = toRemove.right else {
-                toRemove.parent?.left = nil
-            }
-            if toRemove.isLeftChild {
-                
-            }
+        let replacement: BinarySearchTree?
+        
+        if let left = toRemove.left {
+            replacement = left.max()
+        } else if let right = toRemove.right {
+            replacement = right.min()
+        } else {
+            replacement = nil
         }
         
-        // toRemove?.parent?.left = toRemove.l
-    }
-    
-    func minValue() -> T {
-        // TODO
-    }
-    
-    func maxValue() -> T {
-        // TODO
+        replacement?.remove(value: value)
+        
+        if toRemove.isLeftChild {
+            toRemove.parent?.left = replacement
+        } else {
+            toRemove.parent?.right = replacement
+        }
     }
 }
 
 let root = BinarySearchTree<Int>(value: 5)
-// let binaryTree = BinTree<Int>(root: BinaryTree.Node(value: 5, left: BinaryTree.Leaf, right: BinaryTree.Leaf))
+root.insert(value: 2)
+root.insert(value: 10)
+root.insert(value: 2)
 

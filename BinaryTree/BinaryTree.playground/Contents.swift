@@ -1,58 +1,64 @@
-//: Playground - noun: a place where people can play
 
-/* indirect enum BinaryTree<T> {
-    case Node(value: T, left: BinaryTree, right: BinaryTree)
-    case Leaf
-}*/
-
-class Node<T> {
-    
-    var value: T
-    var leftChild: Node?
-    var rightChild: Node?
-    
-    init(value: T) {
-        self.value = value
-    }
-}
-
+/**
+    Binary Tree
+ */
 indirect enum BinaryTree<T> {
-    case empty
+    case leaf
     case node(BinaryTree<T>, T, BinaryTree<T>)
 }
 
-/*class BinaryTree<T> {
-    
-    var root: Node<T>?
-    
-    init(root: Node<T>) {
-        self.root = root
+extension BinaryTree: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .node(let left, let value, let right): return "value=\(value);left=\(left.description);right=(\(right.description)"
+        case .leaf: return ""
+        }
     }
-    
-    func insert(value: T) {
-        // TODO
-        guard let leftChild = root?.leftChild else {
-            
+}
+
+extension BinaryTree {
+    /**
+        Pre-order traversal
+        - Parameter callback: Function that is executed with each retrieved element
+    */
+    public func traversePreOrder(callback: (T) -> Void) {
+        if case let .node(left, value, right) = self {
+            callback(value)
+            left.traversePreOrder(callback: callback)
+            right.traversePreOrder(callback: callback)
         }
     }
     
-    func find(value: T) {
-        // TODO
+    /**
+     In-order traversal
+     In a Binary Search Tree this would retrieve the sorted data
+     - Parameter callback: Function that is executed with each retrieved element
+     */
+    public func traverseInOrder(callback: (T) -> Void) {
+        if case let .node(left, value, right) = self {
+            left.traverseInOrder(callback: callback)
+            callback(value)
+            right.traverseInOrder(callback: callback)
+        }
     }
     
-    func remove(value: T) {
-        // TODO
+    /**
+     Post-order traversal
+     - Parameter callback: Function that is executed with each retrieved element
+     */
+    public func traversePostOrder(callback: (T) -> Void) {
+        if case let .node(left, value, right) = self {
+            left.traversePostOrder(callback: callback)
+            right.traversePostOrder(callback: callback)
+            callback(value)
+        }
     }
-    
-    func minValue() -> T {
-        // TODO
-    }
-    
-    func maxValue() -> T {
-        // TODO
-    }
-    
-}*/
-let rootNode = Node(value: 5)
-// let binaryTree = BinTree<Int>(root: BinaryTree.Node(value: 5, left: BinaryTree.Leaf, right: BinaryTree.Leaf))
+}
 
+func callback(value: Int) {
+    print(value)
+}
+
+// This is an example Binary Tree with 3 nodes
+let myBinaryTree = BinaryTree<Int>.node(BinaryTree<Int>.node(.leaf , 3, .leaf), 5, BinaryTree.node(.leaf, 8, .leaf))
+myBinaryTree.traversePreOrder(callback: callback)
